@@ -1,0 +1,42 @@
+---
+title: "Police Complaints"
+author: "Fahim Ahmed"
+date: "6/9/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ggthemes)
+```
+
+```{r, include=FALSE}
+raw_data <- read_csv("https://raw.githubusercontent.com/Financial-Times/police-misconduct-complaints-analysis/main/output/philly_clean.csv") %>%
+  select(officer_id, po_race, po_sex)
+```
+
+```{r}
+#outputs the officers with the most complaints in descending order.
+clean_data <- raw_data %>%
+  select(officer_id) %>%
+  group_by(officer_id) %>%
+  summarize(total = n()) %>% #n() is basically count
+  arrange(desc(total)) %>%
+  mutate(officer_id = as.character(officer_id)) #it should be treated as a name, rather than number.
+  
+```
+```{r}
+
+ clean_data %>%
+  head(10) %>%
+  ggplot(mapping = aes(x = officer_id, y = total)) + #fct_reorder(total, officer_id)
+    geom_col() +
+    coord_flip() +
+    labs(title = "Police Complaints",
+         subtitle = "Top 10 officers with the most police complaints.",
+         x = "Officer ID",
+         y = "Number of Complaints",
+         caption = "Financial Times (2021)") +
+         theme_economist()
+```
